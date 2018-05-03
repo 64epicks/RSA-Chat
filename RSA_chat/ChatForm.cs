@@ -164,11 +164,11 @@ namespace RSA_chat
                     {
                         int bitlength = 2048;
 
-                        rtbChat.Text += "Success!\n";
+                        //rtbChat.Text += "Success!\n";
                         if (est == false)
                         {
                             est = true;
-                            rtbChat.Text += "Generating " + bitlength + "-bit key...\n";
+                            //rtbChat.Text += "Generating " + bitlength + "-bit key...\n";
 
                             #region Key generation and exchange
 
@@ -209,12 +209,12 @@ namespace RSA_chat
                             string keyToSend = "K" + pubKeyString;
                             byte[] keydata = Encoding.ASCII.GetBytes(keyToSend);
 
-                            rtbChat.Text += "Sending public key to remote...\n";
+                            //rtbChat.Text += "Sending public key to remote...\n";
 
                             sendingClient.Send(keydata, keydata.Length);
 
                             #endregion
-                            rtbChat.Text += "Success!\n";
+                            //rtbChat.Text += "Success!\n";
                             
                         }
                     }
@@ -223,7 +223,7 @@ namespace RSA_chat
                         ongoingHeartBeat = true;
                         string sendToWOstart = message.Substring(1);
                         string sendTo = sendToWOstart.Remove(sendToWOstart.Length - 5);
-                        int sendToPort = Int32.Parse(message.TrimStart(Convert.ToChar("H" + sendTo)));
+                        int sendToPort = Int32.Parse(sendToWOstart.Replace(sendTo, ""));
                         InitializeHeartBeatSender(sendTo, sendToPort);
                         byte[] heartBeatBack = Encoding.ASCII.GetBytes(message);
 
@@ -271,10 +271,10 @@ namespace RSA_chat
                 {
                     ready = true;
                     remotePubKeyString = message.Substring(1);
-                    rtbChat.Text += "Remote accepted\n";
-                    rtbChat.Text += "Remote public key is: " + remotePubKeyString + "\n";
-                    rtbChat.Text += "Your public key is: " + pubKeyString + "\n";
-                    rtbChat.Text += "Your private key is: " + privKeyString + "\n";
+                    //rtbChat.Text += "Remote accepted\n";
+                    //rtbChat.Text += "Remote public key is: " + remotePubKeyString + "\n";
+                    //rtbChat.Text += "Your public key is: " + pubKeyString + "\n";
+                    //rtbChat.Text += "Your private key is: " + privKeyString + "\n";
                 }
                 if (messageType == "T")
                 {
