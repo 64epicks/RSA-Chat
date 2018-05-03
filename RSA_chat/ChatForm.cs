@@ -221,8 +221,9 @@ namespace RSA_chat
                     else
                     {
                         ongoingHeartBeat = true;
-                        string sendTo = message.Substring(1);
-                        int sendToPort = Int32.Parse(message.TrimStart(Convert.ToChar(sendTo)));
+                        string sendToWOstart = message.Substring(1);
+                        string sendTo = sendToWOstart.Remove(sendToWOstart.Length - 5);
+                        int sendToPort = Int32.Parse(message.TrimStart(Convert.ToChar("H" + sendTo)));
                         InitializeHeartBeatSender(sendTo, sendToPort);
                         byte[] heartBeatBack = Encoding.ASCII.GetBytes(message);
 
