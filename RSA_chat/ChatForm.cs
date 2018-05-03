@@ -26,9 +26,11 @@ namespace RSA_chat
 
         string userName;
 
-        bool est = false;
+        static bool est = false;
 
         bool ready = false;
+
+        bool initHeart = false;
 
         bool ongoingHeartBeat = false;
 
@@ -133,19 +135,25 @@ namespace RSA_chat
 
                 InitializeSender();
                 InitializeReceiver();
-
-                heartBeat();
             }
         }
         #endregion
         #region Receiver
-        public void Receiver()
+        void Receiver()
         {
             IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
             AddMessage messageDelegate = MessageReceived;
 
             while (true)
             {
+                if(est == false)
+                {
+                    heartBeatString = "H" + broadcastAddress + port;
+
+                    byte[] heartBeatData = Encoding.ASCII.GetBytes(heartBeatString);
+
+                    sendingClient.Send(heartBeatData, heartBeatData.Length);
+                }
                 byte[] data = receivingClient.Receive(ref endPoint);
                 var message = Encoding.ASCII.GetString(data);
                 string messageType = message[0].ToString();
@@ -323,12 +331,12 @@ namespace RSA_chat
         #region Heartbeat
         public static void heartBeat()
         {
-            heartBeatString = "H" + broadcastAddress + port;
+                heartBeatString = "H" + broadcastAddress + port;
 
-            byte[] heartBeatData = Encoding.ASCII.GetBytes(heartBeatString);
+                byte[] heartBeatData = Encoding.ASCII.GetBytes(heartBeatString);
 
-            sendingClient.Send(heartBeatData, heartBeatData.Length);
-
+                sendingClient.Send(heartBeatData, heartBeatData.Length);
+            
         }
         private void btnHeartBeat_Click(object sender, EventArgs e)
         {
