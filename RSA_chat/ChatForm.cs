@@ -157,66 +157,69 @@ namespace RSA_chat
                 byte[] data = receivingClient.Receive(ref endPoint);
                 var message = Encoding.ASCII.GetString(data);
                 string messageType = message[0].ToString();
+                
                 if (messageType == "H")
                 {
+                    if (est == false)
+                    {
+                        int bitlength = 2048;
+                        est = true;
+                        rtbChat.Text += "Generating " + bitlength + "-bit key...\n";
+
+                        #region Key generation and exchange
+
+                        var csp = new RSACryptoServiceProvider(bitlength);
+
+                        var privKey = csp.ExportParameters(true);
+
+                        var pubKey = csp.ExportParameters(false);
+
+                        string pubKeyStringLocal;
+                        {
+                            //we need some buffer
+                            var sw = new System.IO.StringWriter();
+                            //we need a serializer
+                            var xsw = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                            //serialize the key into the stream
+                            xsw.Serialize(sw, pubKey);
+                            //get the string from the stream
+                            pubKeyStringLocal = sw.ToString();
+                            pubKeyString = pubKeyStringLocal;
+                        }
+                        string privKeyStringLocal;
+                        {
+                            //we need some buffer
+                            var sw = new System.IO.StringWriter();
+                            //we need a serializer
+                            var xsx = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                            //serialize the key into the stream
+                            xsx.Serialize(sw, privKey);
+                            //get the string from the stream
+                            privKeyStringLocal = sw.ToString();
+                            privKeyString = privKeyStringLocal;
+                        }
+
+                        csp = new RSACryptoServiceProvider();
+                        csp.ImportParameters(pubKey);
+
+                        string keyToSend = "K" + pubKeyString;
+                        byte[] keydata = Encoding.ASCII.GetBytes(keyToSend);
+
+                        rtbChat.Text += "Sending public key to remote...\n";
+
+                        sendingClient.Send(keydata, keydata.Length);
+
+                        #endregion
+                        rtbChat.Text += "Success!\n";
+
+                    }
                     ongoingHeartBeat = true;
                     if (message == heartBeatString)
                     {
-                        int bitlength = 2048;
 
+                        
                         rtbChat.Text += "Success!\n";
-                        if (est == false)
-                        {
-                            est = true;
-                            rtbChat.Text += "Generating " + bitlength + "-bit key...\n";
-
-                            #region Key generation and exchange
-
-                            var csp = new RSACryptoServiceProvider(bitlength);
-
-                            var privKey = csp.ExportParameters(true);
-
-                            var pubKey = csp.ExportParameters(false);
-
-                            string pubKeyStringLocal;
-                            {
-                                //we need some buffer
-                                var sw = new System.IO.StringWriter();
-                                //we need a serializer
-                                var xsw = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
-                                //serialize the key into the stream
-                                xsw.Serialize(sw, pubKey);
-                                //get the string from the stream
-                                pubKeyStringLocal = sw.ToString();
-                                pubKeyString = pubKeyStringLocal;
-                            }
-                            string privKeyStringLocal;
-                            {
-                                //we need some buffer
-                                var sw = new System.IO.StringWriter();
-                                //we need a serializer
-                                var xsx = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
-                                //serialize the key into the stream
-                                xsx.Serialize(sw, privKey);
-                                //get the string from the stream
-                                privKeyStringLocal = sw.ToString();
-                                privKeyString = privKeyStringLocal;
-                            }
-
-                            csp = new RSACryptoServiceProvider();
-                            csp.ImportParameters(pubKey);
-
-                            string keyToSend = "K" + pubKeyString;
-                            byte[] keydata = Encoding.ASCII.GetBytes(keyToSend);
-
-                            rtbChat.Text += "Sending public key to remote...\n";
-
-                            sendingClient.Send(keydata, keydata.Length);
-
-                            #endregion
-                            rtbChat.Text += "Success!\n";
-                            
-                        }
+                        
                     }
                     else
                     {
