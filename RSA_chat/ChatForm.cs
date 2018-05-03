@@ -30,7 +30,7 @@ namespace RSA_chat
 
         bool ready = false;
 
-        bool initHeart = false;
+        bool kryptoDone = false;
 
         bool ongoingHeartBeat = false;
 
@@ -135,98 +135,99 @@ namespace RSA_chat
 
                 InitializeSender();
                 InitializeReceiver();
+
+                heartBeat();
             }
         }
         #endregion
         #region Receiver
-        void Receiver()
+        public void Receiver()
         {
+            if(est == true && kryptoDone == false)
+            {
+                kryptoDone = true;
+
+                rtbChat.Text += "Success!\n";
+
+                int bitlength = 2048;
+
+                rtbChat.Text += "Generating " + bitlength + "-bit key...\n";
+
+                #region Key generation and exchange
+
+                var csp = new RSACryptoServiceProvider(bitlength);
+
+                var privKey = csp.ExportParameters(true);
+
+                var pubKey = csp.ExportParameters(false);
+
+                string pubKeyStringLocal;
+                {
+                    //we need some buffer
+                    var sw = new System.IO.StringWriter();
+                    //we need a serializer
+                    var xsw = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                    //serialize the key into the stream
+                    xsw.Serialize(sw, pubKey);
+                    //get the string from the stream
+                    pubKeyStringLocal = sw.ToString();
+                    pubKeyString = pubKeyStringLocal;
+                }
+                string privKeyStringLocal;
+                {
+                    //we need some buffer
+                    var sw = new System.IO.StringWriter();
+                    //we need a serializer
+                    var xsx = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                    //serialize the key into the stream
+                    xsx.Serialize(sw, privKey);
+                    //get the string from the stream
+                    privKeyStringLocal = sw.ToString();
+                    privKeyString = privKeyStringLocal;
+                }
+
+                csp = new RSACryptoServiceProvider();
+                csp.ImportParameters(pubKey);
+
+                string keyToSend = "K" + pubKeyString;
+                byte[] keydata = Encoding.ASCII.GetBytes(keyToSend);
+
+                rtbChat.Text += "Sending public key to remote...\n";
+
+                sendingClient.Send(keydata, keydata.Length);
+
+                #endregion
+                rtbChat.Text += "Success!\n";
+
+            }
             IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
             AddMessage messageDelegate = MessageReceived;
 
             while (true)
             {
-                //if(est == false)
-                //{
-                //    heartBeatString = "H" + broadcastAddress + port;
-
-                //    byte[] heartBeatData = Encoding.ASCII.GetBytes(heartBeatString);
-
-                //    sendingClient.Send(heartBeatData, heartBeatData.Length);
-                //}
                 byte[] data = receivingClient.Receive(ref endPoint);
                 var message = Encoding.ASCII.GetString(data);
                 string messageType = message[0].ToString();
-                
                 if (messageType == "H")
                 {
-                    if (est == false)
-                    {
-                        int bitlength = 2048;
-                        est = true;
-                        rtbChat.Text += "Generating " + bitlength + "-bit key...\n";
-
-                        #region Key generation and exchange
-
-                        var csp = new RSACryptoServiceProvider(bitlength);
-
-                        var privKey = csp.ExportParameters(true);
-
-                        var pubKey = csp.ExportParameters(false);
-
-                        string pubKeyStringLocal;
-                        {
-                            //we need some buffer
-                            var sw = new System.IO.StringWriter();
-                            //we need a serializer
-                            var xsw = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
-                            //serialize the key into the stream
-                            xsw.Serialize(sw, pubKey);
-                            //get the string from the stream
-                            pubKeyStringLocal = sw.ToString();
-                            pubKeyString = pubKeyStringLocal;
-                        }
-                        string privKeyStringLocal;
-                        {
-                            //we need some buffer
-                            var sw = new System.IO.StringWriter();
-                            //we need a serializer
-                            var xsx = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
-                            //serialize the key into the stream
-                            xsx.Serialize(sw, privKey);
-                            //get the string from the stream
-                            privKeyStringLocal = sw.ToString();
-                            privKeyString = privKeyStringLocal;
-                        }
-
-                        csp = new RSACryptoServiceProvider();
-                        csp.ImportParameters(pubKey);
-
-                        string keyToSend = "K" + pubKeyString;
-                        byte[] keydata = Encoding.ASCII.GetBytes(keyToSend);
-
-                        rtbChat.Text += "Sending public key to remote...\n";
-
-                        sendingClient.Send(keydata, keydata.Length);
-
-                        #endregion
-                        rtbChat.Text += "Success!\n";
-
-                    }
                     ongoingHeartBeat = true;
                     if (message == heartBeatString)
                     {
 
-                        
+
                         rtbChat.Text += "Success!\n";
-                        
+                        if (est == true)
+                        {
+                            est = true;
+                            
+                            
+                        }
                     }
                     else
                     {
                         ongoingHeartBeat = true;
-                        string sendToWOstart = message.Substring(1);
-                        string sendTo = sendToWOstart.Remove(sendToWOstart.Length - 5);
-                        int sendToPort = Int32.Parse(sendToWOstart.Replace(sendTo, ""));
+                        string sendTo = message.Substring(1);
+                        int sendToPort = Int32.Parse(message.TrimStart(Convert.ToChar(sendTo)));
                         InitializeHeartBeatSender(sendTo, sendToPort);
                         byte[] heartBeatBack = Encoding.ASCII.GetBytes(message);
 
@@ -287,7 +288,7 @@ namespace RSA_chat
             }
         }
 
-        private void MessageReceived(string message)
+        public void MessageReceived(string message)
         {
             rtbChat.Text += message + "\n";
         }
@@ -335,12 +336,25 @@ namespace RSA_chat
         #region Heartbeat
         public static void heartBeat()
         {
-                heartBeatString = "H" + broadcastAddress + port;
+            heartBeatString = "H" + broadcastAddress + port;
 
-                byte[] heartBeatData = Encoding.ASCII.GetBytes(heartBeatString);
+            byte[] heartBeatData = Encoding.ASCII.GetBytes(heartBeatString);
 
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
+
+            while (est == false)
+            {
                 sendingClient.Send(heartBeatData, heartBeatData.Length);
-            
+
+                byte[] data = receivingClient.Receive(ref endPoint);
+                var message = Encoding.ASCII.GetString(data);
+                string messageType = message[0].ToString();
+                if (messageType == "H")
+                {
+                    est = true;
+                }
+            }
+
         }
         private void btnHeartBeat_Click(object sender, EventArgs e)
         {
