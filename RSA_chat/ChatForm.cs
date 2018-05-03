@@ -146,14 +146,14 @@ namespace RSA_chat
 
             while (true)
             {
-                if(est == false)
-                {
-                    heartBeatString = "H" + broadcastAddress + port;
+                //if(est == false)
+                //{
+                //    heartBeatString = "H" + broadcastAddress + port;
 
-                    byte[] heartBeatData = Encoding.ASCII.GetBytes(heartBeatString);
+                //    byte[] heartBeatData = Encoding.ASCII.GetBytes(heartBeatString);
 
-                    sendingClient.Send(heartBeatData, heartBeatData.Length);
-                }
+                //    sendingClient.Send(heartBeatData, heartBeatData.Length);
+                //}
                 byte[] data = receivingClient.Receive(ref endPoint);
                 var message = Encoding.ASCII.GetString(data);
                 string messageType = message[0].ToString();
