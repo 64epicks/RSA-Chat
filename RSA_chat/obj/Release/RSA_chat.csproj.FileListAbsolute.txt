@@ -1,0 +1,10 @@
+A:\Media\dfjdh\C--Repository\RSA_chat\RSA_chat\bin\Release\RSA_chat.exe.config
+A:\Media\dfjdh\C--Repository\RSA_chat\RSA_chat\bin\Release\RSA_chat.exe
+A:\Media\dfjdh\C--Repository\RSA_chat\RSA_chat\bin\Release\RSA_chat.pdb
+A:\Media\dfjdh\C--Repository\RSA_chat\RSA_chat\obj\Release\RSA_chat.ChatForm.resources
+A:\Media\dfjdh\C--Repository\RSA_chat\RSA_chat\obj\Release\RSA_chat.LoginForm.resources
+A:\Media\dfjdh\C--Repository\RSA_chat\RSA_chat\obj\Release\RSA_chat.Properties.Resources.resources
+A:\Media\dfjdh\C--Repository\RSA_chat\RSA_chat\obj\Release\RSA_chat.csproj.GenerateResource.cache
+A:\Media\dfjdh\C--Repository\RSA_chat\RSA_chat\obj\Release\RSA_chat.csproj.CoreCompileInputs.cache
+A:\Media\dfjdh\C--Repository\RSA_chat\RSA_chat\obj\Release\RSA_chat.exe
+A:\Media\dfjdh\C--Repository\RSA_chat\RSA_chat\obj\Release\RSA_chat.pdb
