@@ -353,7 +353,7 @@ namespace RSA_chat
                 {
                     est = true;
                 }
-                Thread.Sleep(500);
+                Thread.Sleep(2000);
             }
 
         }
