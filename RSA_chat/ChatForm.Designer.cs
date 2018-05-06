@@ -38,13 +38,18 @@
             this.tbPORT = new System.Windows.Forms.TextBox();
             this.tbUsr = new System.Windows.Forms.TextBox();
             this.lbPor = new System.Windows.Forms.Label();
-            this.btnConnect = new System.Windows.Forms.Button();
+            this.btnEntr = new System.Windows.Forms.Button();
             this.btnHeartBeat = new System.Windows.Forms.Button();
+            this.btnCnt = new System.Windows.Forms.Button();
+            this.btnCng = new System.Windows.Forms.Button();
+            this.tbCngPort = new System.Windows.Forms.TextBox();
+            this.lbPortCng = new System.Windows.Forms.Label();
+            this.tbCngIP = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // tbSend
             // 
-            this.tbSend.Location = new System.Drawing.Point(12, 461);
+            this.tbSend.Location = new System.Drawing.Point(12, 488);
             this.tbSend.MaxLength = 968;
             this.tbSend.Name = "tbSend";
             this.tbSend.Size = new System.Drawing.Size(628, 20);
@@ -56,7 +61,7 @@
             // 
             // btnSend
             // 
-            this.btnSend.Location = new System.Drawing.Point(646, 461);
+            this.btnSend.Location = new System.Drawing.Point(646, 488);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(130, 20);
             this.btnSend.TabIndex = 2;
@@ -67,10 +72,10 @@
             // 
             // rtbChat
             // 
-            this.rtbChat.Location = new System.Drawing.Point(12, 12);
+            this.rtbChat.Location = new System.Drawing.Point(12, 38);
             this.rtbChat.Name = "rtbChat";
             this.rtbChat.ReadOnly = true;
-            this.rtbChat.Size = new System.Drawing.Size(764, 443);
+            this.rtbChat.Size = new System.Drawing.Size(764, 444);
             this.rtbChat.TabIndex = 2;
             this.rtbChat.TabStop = false;
             this.rtbChat.Text = "";
@@ -141,34 +146,89 @@
             this.lbPor.TabIndex = 9;
             this.lbPor.Text = "Port:";
             // 
-            // btnConnect
+            // btnEntr
             // 
-            this.btnConnect.Location = new System.Drawing.Point(269, 207);
-            this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(235, 23);
-            this.btnConnect.TabIndex = 10;
-            this.btnConnect.Text = "Connect";
-            this.btnConnect.UseVisualStyleBackColor = true;
-            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
+            this.btnEntr.Location = new System.Drawing.Point(269, 207);
+            this.btnEntr.Name = "btnEntr";
+            this.btnEntr.Size = new System.Drawing.Size(235, 23);
+            this.btnEntr.TabIndex = 10;
+            this.btnEntr.Text = "Enter";
+            this.btnEntr.UseVisualStyleBackColor = true;
+            this.btnEntr.Click += new System.EventHandler(this.btnEntr_Click);
             // 
             // btnHeartBeat
             // 
-            this.btnHeartBeat.Location = new System.Drawing.Point(646, 487);
+            this.btnHeartBeat.Location = new System.Drawing.Point(12, 12);
             this.btnHeartBeat.Name = "btnHeartBeat";
             this.btnHeartBeat.Size = new System.Drawing.Size(130, 21);
             this.btnHeartBeat.TabIndex = 11;
-            this.btnHeartBeat.Text = "Heartbeat";
+            this.btnHeartBeat.Text = "Check connection";
             this.btnHeartBeat.UseVisualStyleBackColor = true;
             this.btnHeartBeat.Visible = false;
             this.btnHeartBeat.Click += new System.EventHandler(this.btnHeartBeat_Click);
+            // 
+            // btnCnt
+            // 
+            this.btnCnt.Location = new System.Drawing.Point(580, 174);
+            this.btnCnt.Name = "btnCnt";
+            this.btnCnt.Size = new System.Drawing.Size(130, 20);
+            this.btnCnt.TabIndex = 12;
+            this.btnCnt.Text = "Connect";
+            this.btnCnt.UseVisualStyleBackColor = true;
+            this.btnCnt.Visible = false;
+            // 
+            // btnCng
+            // 
+            this.btnCng.Location = new System.Drawing.Point(647, 12);
+            this.btnCng.Name = "btnCng";
+            this.btnCng.Size = new System.Drawing.Size(130, 21);
+            this.btnCng.TabIndex = 13;
+            this.btnCng.Text = "Change";
+            this.btnCng.UseVisualStyleBackColor = true;
+            this.btnCng.Visible = false;
+            // 
+            // tbCngPort
+            // 
+            this.tbCngPort.Location = new System.Drawing.Point(542, 12);
+            this.tbCngPort.MaxLength = 968;
+            this.tbCngPort.Name = "tbCngPort";
+            this.tbCngPort.Size = new System.Drawing.Size(99, 20);
+            this.tbCngPort.TabIndex = 14;
+            this.tbCngPort.TabStop = false;
+            this.tbCngPort.Visible = false;
+            // 
+            // lbPortCng
+            // 
+            this.lbPortCng.AutoSize = true;
+            this.lbPortCng.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbPortCng.Location = new System.Drawing.Point(524, 12);
+            this.lbPortCng.Name = "lbPortCng";
+            this.lbPortCng.Size = new System.Drawing.Size(12, 18);
+            this.lbPortCng.TabIndex = 15;
+            this.lbPortCng.Text = ":";
+            // 
+            // tbCngIP
+            // 
+            this.tbCngIP.Location = new System.Drawing.Point(369, 13);
+            this.tbCngIP.MaxLength = 968;
+            this.tbCngIP.Name = "tbCngIP";
+            this.tbCngIP.Size = new System.Drawing.Size(149, 20);
+            this.tbCngIP.TabIndex = 16;
+            this.tbCngIP.TabStop = false;
+            this.tbCngIP.Visible = false;
             // 
             // ChatForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(789, 520);
+            this.Controls.Add(this.tbCngIP);
+            this.Controls.Add(this.lbPortCng);
+            this.Controls.Add(this.tbCngPort);
+            this.Controls.Add(this.btnCng);
+            this.Controls.Add(this.btnCnt);
             this.Controls.Add(this.btnHeartBeat);
-            this.Controls.Add(this.btnConnect);
+            this.Controls.Add(this.btnEntr);
             this.Controls.Add(this.lbPor);
             this.Controls.Add(this.tbUsr);
             this.Controls.Add(this.tbPORT);
@@ -200,7 +260,12 @@
         private System.Windows.Forms.TextBox tbPORT;
         private System.Windows.Forms.TextBox tbUsr;
         private System.Windows.Forms.Label lbPor;
-        private System.Windows.Forms.Button btnConnect;
+        private System.Windows.Forms.Button btnEntr;
         private System.Windows.Forms.Button btnHeartBeat;
+        private System.Windows.Forms.Button btnCnt;
+        private System.Windows.Forms.Button btnCng;
+        private System.Windows.Forms.TextBox tbCngPort;
+        private System.Windows.Forms.Label lbPortCng;
+        private System.Windows.Forms.TextBox tbCngIP;
     }
 }

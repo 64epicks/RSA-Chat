@@ -100,7 +100,7 @@ namespace RSA_chat
             receivingThread.IsBackground = true;
             receivingThread.Start();
         }
-        private void btnConnect_Click(object sender, EventArgs e)
+        private void btnEntr_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(tbIP.Text) || string.IsNullOrEmpty(tbPORT.Text) || string.IsNullOrEmpty(tbUsr.Text))
             {
@@ -122,12 +122,20 @@ namespace RSA_chat
                 tbIP.Hide();
                 tbPORT.Hide();
                 tbUsr.Hide();
-                btnConnect.Hide();
+                btnEntr.Hide();
 
                 rtbChat.Show();
                 tbSend.Show();
+                tbCngIP.Show();
+                tbCngPort.Show();
+                btnCng.Show();
                 btnSend.Show();
                 btnHeartBeat.Show();
+                btnCnt.Show();
+
+                tbCngIP.Text = broadcastAddress;
+                tbCngPort.Text = port.ToString();
+
 
                 rtbChat.Text += "Connecting to " + broadcastAddress + "...\n";
 
