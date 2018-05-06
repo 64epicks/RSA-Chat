@@ -26,11 +26,9 @@ namespace RSA_chat
 
         string userName;
 
-        static bool est = false;
+        bool est = false;
 
         bool ready = false;
-
-        bool kryptoDone = false;
 
         bool ongoingHeartBeat = false;
 
@@ -143,63 +141,6 @@ namespace RSA_chat
         #region Receiver
         public void Receiver()
         {
-            if(est == true && kryptoDone == false)
-            {
-                kryptoDone = true;
-
-                rtbChat.Text += "Success!\n";
-
-                int bitlength = 2048;
-
-                rtbChat.Text += "Generating " + bitlength + "-bit key...\n";
-
-                #region Key generation and exchange
-
-                var csp = new RSACryptoServiceProvider(bitlength);
-
-                var privKey = csp.ExportParameters(true);
-
-                var pubKey = csp.ExportParameters(false);
-
-                string pubKeyStringLocal;
-                {
-                    //we need some buffer
-                    var sw = new System.IO.StringWriter();
-                    //we need a serializer
-                    var xsw = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
-                    //serialize the key into the stream
-                    xsw.Serialize(sw, pubKey);
-                    //get the string from the stream
-                    pubKeyStringLocal = sw.ToString();
-                    pubKeyString = pubKeyStringLocal;
-                }
-                string privKeyStringLocal;
-                {
-                    //we need some buffer
-                    var sw = new System.IO.StringWriter();
-                    //we need a serializer
-                    var xsx = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
-                    //serialize the key into the stream
-                    xsx.Serialize(sw, privKey);
-                    //get the string from the stream
-                    privKeyStringLocal = sw.ToString();
-                    privKeyString = privKeyStringLocal;
-                }
-
-                csp = new RSACryptoServiceProvider();
-                csp.ImportParameters(pubKey);
-
-                string keyToSend = "K" + pubKeyString;
-                byte[] keydata = Encoding.ASCII.GetBytes(keyToSend);
-
-                rtbChat.Text += "Sending public key to remote...\n";
-
-                sendingClient.Send(keydata, keydata.Length);
-
-                #endregion
-                rtbChat.Text += "Success!\n";
-
-            }
             IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
             AddMessage messageDelegate = MessageReceived;
 
@@ -213,14 +154,60 @@ namespace RSA_chat
                     ongoingHeartBeat = true;
                     if (message == heartBeatString)
                     {
-
+                        int bitlength = 2048;
 
                         rtbChat.Text += "Success!\n";
-                        if (est == true)
+                        if (est == false)
                         {
                             est = true;
-                            
-                            
+                            rtbChat.Text += "Generating " + bitlength + "-bit key...\n";
+
+                            #region Key generation and exchange
+
+                            var csp = new RSACryptoServiceProvider(bitlength);
+
+                            var privKey = csp.ExportParameters(true);
+
+                            var pubKey = csp.ExportParameters(false);
+
+                            string pubKeyStringLocal;
+                            {
+                                //we need some buffer
+                                var sw = new System.IO.StringWriter();
+                                //we need a serializer
+                                var xsw = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                                //serialize the key into the stream
+                                xsw.Serialize(sw, pubKey);
+                                //get the string from the stream
+                                pubKeyStringLocal = sw.ToString();
+                                pubKeyString = pubKeyStringLocal;
+                            }
+                            string privKeyStringLocal;
+                            {
+                                //we need some buffer
+                                var sw = new System.IO.StringWriter();
+                                //we need a serializer
+                                var xsx = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                                //serialize the key into the stream
+                                xsx.Serialize(sw, privKey);
+                                //get the string from the stream
+                                privKeyStringLocal = sw.ToString();
+                                privKeyString = privKeyStringLocal;
+                            }
+
+                            csp = new RSACryptoServiceProvider();
+                            csp.ImportParameters(pubKey);
+
+                            string keyToSend = "K" + pubKeyString;
+                            byte[] keydata = Encoding.ASCII.GetBytes(keyToSend);
+
+                            rtbChat.Text += "Sending public key to remote...\n";
+
+                            sendingClient.Send(keydata, keydata.Length);
+
+                            #endregion
+                            rtbChat.Text += "Success!\n";
+
                         }
                     }
                     else
@@ -263,7 +250,7 @@ namespace RSA_chat
                     }
                 }
                 messageType = message[0].ToString();
-                if(messageType == "K")
+                if (messageType == "K")
                 {
                     remotePubKeyString = message.Substring(1);
                     ready = true;
@@ -271,7 +258,7 @@ namespace RSA_chat
                     byte[] acceptData = Encoding.ASCII.GetBytes(acceptToSend);
                     sendingClient.Send(acceptData, acceptData.Length);
                 }
-                if(messageType == "O")
+                if (messageType == "O")
                 {
                     ready = true;
                     remotePubKeyString = message.Substring(1);
@@ -288,7 +275,7 @@ namespace RSA_chat
             }
         }
 
-        public void MessageReceived(string message)
+        private void MessageReceived(string message)
         {
             rtbChat.Text += message + "\n";
         }
@@ -302,15 +289,15 @@ namespace RSA_chat
             {
                 if (ready == true)
                 {
-                    
-                    
-                        //get a stream from the string
-                        var sr = new System.IO.StringReader(remotePubKeyString);
-                        //we need a deserializer
-                        var xs = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
-                        //get the object back from the stream
-                        var pubKey = (RSAParameters)xs.Deserialize(sr);
-                    
+
+
+                    //get a stream from the string
+                    var sr = new System.IO.StringReader(remotePubKeyString);
+                    //we need a deserializer
+                    var xs = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                    //get the object back from the stream
+                    var pubKey = (RSAParameters)xs.Deserialize(sr);
+
                     var csp = new RSACryptoServiceProvider();
                     csp.ImportParameters(pubKey);
 
@@ -340,21 +327,7 @@ namespace RSA_chat
 
             byte[] heartBeatData = Encoding.ASCII.GetBytes(heartBeatString);
 
-            IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
-
-            while (est == false)
-            {
-                sendingClient.Send(heartBeatData, heartBeatData.Length);
-
-                byte[] data = receivingClient.Receive(ref endPoint);
-                var message = Encoding.ASCII.GetString(data);
-                string messageType = message[0].ToString();
-                if (messageType == "H")
-                {
-                    est = true;
-                }
-                Thread.Sleep(2000);
-            }
+            sendingClient.Send(heartBeatData, heartBeatData.Length);
 
         }
         private void btnHeartBeat_Click(object sender, EventArgs e)
