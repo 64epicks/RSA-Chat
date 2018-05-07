@@ -40,15 +40,20 @@
             this.lbPor = new System.Windows.Forms.Label();
             this.btnEntr = new System.Windows.Forms.Button();
             this.btnHeartBeat = new System.Windows.Forms.Button();
-            this.btnCnt = new System.Windows.Forms.Button();
             this.btnCng = new System.Windows.Forms.Button();
             this.tbCngPort = new System.Windows.Forms.TextBox();
             this.lbPortCng = new System.Windows.Forms.Label();
             this.tbCngIP = new System.Windows.Forms.TextBox();
+            this.lbRe = new System.Windows.Forms.Label();
+            this.lbReName = new System.Windows.Forms.Label();
+            this.lbReIP = new System.Windows.Forms.Label();
+            this.btnReAc = new System.Windows.Forms.Button();
+            this.btnReDe = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // tbSend
             // 
+            this.tbSend.Enabled = false;
             this.tbSend.Location = new System.Drawing.Point(12, 488);
             this.tbSend.MaxLength = 968;
             this.tbSend.Name = "tbSend";
@@ -61,6 +66,7 @@
             // 
             // btnSend
             // 
+            this.btnSend.Enabled = false;
             this.btnSend.Location = new System.Drawing.Point(646, 488);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(130, 20);
@@ -86,7 +92,7 @@
             // 
             this.lbIP.AutoSize = true;
             this.lbIP.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbIP.Location = new System.Drawing.Point(189, 110);
+            this.lbIP.Location = new System.Drawing.Point(189, 142);
             this.lbIP.Name = "lbIP";
             this.lbIP.Size = new System.Drawing.Size(74, 18);
             this.lbIP.TabIndex = 3;
@@ -105,7 +111,7 @@
             // 
             this.lbUsr.AutoSize = true;
             this.lbUsr.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbUsr.Location = new System.Drawing.Point(182, 174);
+            this.lbUsr.Location = new System.Drawing.Point(182, 110);
             this.lbUsr.Name = "lbUsr";
             this.lbUsr.Size = new System.Drawing.Size(81, 18);
             this.lbUsr.TabIndex = 5;
@@ -115,7 +121,7 @@
             // tbIP
             // 
             this.tbIP.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tbIP.Location = new System.Drawing.Point(269, 110);
+            this.tbIP.Location = new System.Drawing.Point(269, 142);
             this.tbIP.Name = "tbIP";
             this.tbIP.Size = new System.Drawing.Size(235, 26);
             this.tbIP.TabIndex = 6;
@@ -123,7 +129,7 @@
             // tbPORT
             // 
             this.tbPORT.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tbPORT.Location = new System.Drawing.Point(269, 142);
+            this.tbPORT.Location = new System.Drawing.Point(269, 174);
             this.tbPORT.Name = "tbPORT";
             this.tbPORT.Size = new System.Drawing.Size(235, 26);
             this.tbPORT.TabIndex = 7;
@@ -131,7 +137,7 @@
             // tbUsr
             // 
             this.tbUsr.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tbUsr.Location = new System.Drawing.Point(269, 174);
+            this.tbUsr.Location = new System.Drawing.Point(269, 110);
             this.tbUsr.Name = "tbUsr";
             this.tbUsr.Size = new System.Drawing.Size(235, 26);
             this.tbUsr.TabIndex = 8;
@@ -140,7 +146,7 @@
             // 
             this.lbPor.AutoSize = true;
             this.lbPor.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbPor.Location = new System.Drawing.Point(223, 142);
+            this.lbPor.Location = new System.Drawing.Point(223, 174);
             this.lbPor.Name = "lbPor";
             this.lbPor.Size = new System.Drawing.Size(40, 18);
             this.lbPor.TabIndex = 9;
@@ -152,7 +158,7 @@
             this.btnEntr.Name = "btnEntr";
             this.btnEntr.Size = new System.Drawing.Size(235, 23);
             this.btnEntr.TabIndex = 10;
-            this.btnEntr.Text = "Enter";
+            this.btnEntr.Text = "Connect";
             this.btnEntr.UseVisualStyleBackColor = true;
             this.btnEntr.Click += new System.EventHandler(this.btnEntr_Click);
             // 
@@ -166,16 +172,6 @@
             this.btnHeartBeat.UseVisualStyleBackColor = true;
             this.btnHeartBeat.Visible = false;
             this.btnHeartBeat.Click += new System.EventHandler(this.btnHeartBeat_Click);
-            // 
-            // btnCnt
-            // 
-            this.btnCnt.Location = new System.Drawing.Point(580, 174);
-            this.btnCnt.Name = "btnCnt";
-            this.btnCnt.Size = new System.Drawing.Size(130, 20);
-            this.btnCnt.TabIndex = 12;
-            this.btnCnt.Text = "Connect";
-            this.btnCnt.UseVisualStyleBackColor = true;
-            this.btnCnt.Visible = false;
             // 
             // btnCng
             // 
@@ -206,6 +202,7 @@
             this.lbPortCng.Size = new System.Drawing.Size(12, 18);
             this.lbPortCng.TabIndex = 15;
             this.lbPortCng.Text = ":";
+            this.lbPortCng.Visible = false;
             // 
             // tbCngIP
             // 
@@ -217,16 +214,77 @@
             this.tbCngIP.TabStop = false;
             this.tbCngIP.Visible = false;
             // 
+            // lbRe
+            // 
+            this.lbRe.AutoSize = true;
+            this.lbRe.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbRe.Location = new System.Drawing.Point(334, 49);
+            this.lbRe.Name = "lbRe";
+            this.lbRe.Size = new System.Drawing.Size(102, 18);
+            this.lbRe.TabIndex = 17;
+            this.lbRe.Text = "Request from:";
+            this.lbRe.Visible = false;
+            // 
+            // lbReName
+            // 
+            this.lbReName.AutoSize = true;
+            this.lbReName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbReName.Location = new System.Drawing.Point(334, 67);
+            this.lbReName.Name = "lbReName";
+            this.lbReName.Size = new System.Drawing.Size(84, 15);
+            this.lbReName.TabIndex = 18;
+            this.lbReName.Text = "Request from:";
+            this.lbReName.Visible = false;
+            // 
+            // lbReIP
+            // 
+            this.lbReIP.AutoSize = true;
+            this.lbReIP.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbReIP.Location = new System.Drawing.Point(334, 82);
+            this.lbReIP.Name = "lbReIP";
+            this.lbReIP.Size = new System.Drawing.Size(84, 15);
+            this.lbReIP.TabIndex = 19;
+            this.lbReIP.Text = "Request from:";
+            this.lbReIP.Visible = false;
+            // 
+            // btnReAc
+            // 
+            this.btnReAc.Enabled = false;
+            this.btnReAc.Location = new System.Drawing.Point(269, 67);
+            this.btnReAc.Name = "btnReAc";
+            this.btnReAc.Size = new System.Drawing.Size(59, 33);
+            this.btnReAc.TabIndex = 20;
+            this.btnReAc.Text = "Yes";
+            this.btnReAc.UseVisualStyleBackColor = true;
+            this.btnReAc.Visible = false;
+            this.btnReAc.Click += new System.EventHandler(this.btnReAc_Click);
+            // 
+            // btnReDe
+            // 
+            this.btnReDe.Enabled = false;
+            this.btnReDe.Location = new System.Drawing.Point(424, 67);
+            this.btnReDe.Name = "btnReDe";
+            this.btnReDe.Size = new System.Drawing.Size(59, 33);
+            this.btnReDe.TabIndex = 21;
+            this.btnReDe.Text = "No";
+            this.btnReDe.UseVisualStyleBackColor = true;
+            this.btnReDe.Visible = false;
+            this.btnReDe.Click += new System.EventHandler(this.btnReDe_Click);
+            // 
             // ChatForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(789, 520);
+            this.Controls.Add(this.btnReDe);
+            this.Controls.Add(this.btnReAc);
+            this.Controls.Add(this.lbReIP);
+            this.Controls.Add(this.lbReName);
+            this.Controls.Add(this.lbRe);
             this.Controls.Add(this.tbCngIP);
             this.Controls.Add(this.lbPortCng);
             this.Controls.Add(this.tbCngPort);
             this.Controls.Add(this.btnCng);
-            this.Controls.Add(this.btnCnt);
             this.Controls.Add(this.btnHeartBeat);
             this.Controls.Add(this.btnEntr);
             this.Controls.Add(this.lbPor);
@@ -262,10 +320,14 @@
         private System.Windows.Forms.Label lbPor;
         private System.Windows.Forms.Button btnEntr;
         private System.Windows.Forms.Button btnHeartBeat;
-        private System.Windows.Forms.Button btnCnt;
         private System.Windows.Forms.Button btnCng;
         private System.Windows.Forms.TextBox tbCngPort;
         private System.Windows.Forms.Label lbPortCng;
         private System.Windows.Forms.TextBox tbCngIP;
+        private System.Windows.Forms.Label lbRe;
+        private System.Windows.Forms.Label lbReName;
+        private System.Windows.Forms.Label lbReIP;
+        private System.Windows.Forms.Button btnReAc;
+        private System.Windows.Forms.Button btnReDe;
     }
 }

@@ -12,6 +12,16 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Security;
 using System.Security.Cryptography;
+using System.IO;
+
+/* 
+List of protocol letter types:
+T = Encrypted readable message to user.
+H = Heartbeat request / heartbeat confirmation.
+K = Public key send.
+O = Remote public key accept.
+R = Connection request to remote.
+*/
 
 
 namespace RSA_chat
@@ -32,10 +42,18 @@ namespace RSA_chat
 
         bool ongoingHeartBeat = false;
 
+        string reUsrName;
+
+        string reIP;
+
+        int rePort;
+
         static int port;
         static string broadcastAddress;
 
         static string heartBeatString;
+
+        static string localIP = GetPublicIP();
 
         private string pubKeyString;
         private string privKeyString;
@@ -60,6 +78,7 @@ namespace RSA_chat
 
         void ChatForm_Load(object sender, EventArgs e)
         {
+            InitializeReceiver();
             //this.Hide();
 
             //using (LoginForm loginForm = new LoginForm())
@@ -77,9 +96,9 @@ namespace RSA_chat
 
         }
         //Initializing the sender
-        private void InitializeSender()
+        private void InitializeSender(string initAdrss, int initPort)
         {
-            sendingClient = new UdpClient(broadcastAddress, port);
+            sendingClient = new UdpClient(initAdrss, initPort);
             sendingClient.EnableBroadcast = true;
         }
 
@@ -115,34 +134,14 @@ namespace RSA_chat
 
                 tbSend.Focus();
 
-                lbIP.Hide();
-                lbPor.Hide();
-                lbPORT.Hide();
-                lbUsr.Hide();
-                tbIP.Hide();
-                tbPORT.Hide();
-                tbUsr.Hide();
-                btnEntr.Hide();
-
-                rtbChat.Show();
-                tbSend.Show();
-                tbCngIP.Show();
-                tbCngPort.Show();
-                btnCng.Show();
-                btnSend.Show();
-                btnHeartBeat.Show();
-                btnCnt.Show();
-
-                tbCngIP.Text = broadcastAddress;
-                tbCngPort.Text = port.ToString();
+                enterChatMode();
 
 
                 rtbChat.Text += "Connecting to " + broadcastAddress + "...\n";
 
-                InitializeSender();
-                InitializeReceiver();
+                InitializeSender(broadcastAddress, port);
 
-                heartBeat();
+                conRe();
             }
         }
         #endregion
@@ -157,72 +156,57 @@ namespace RSA_chat
                 byte[] data = receivingClient.Receive(ref endPoint);
                 var message = Encoding.ASCII.GetString(data);
                 string messageType = message[0].ToString();
+                string messageWOPro = message.Substring(1);
+                if(messageType == "R")
+                {
+                    if (est != true)
+                    {
+                        reUsrName = ExtractString(messageWOPro, "username");
+                        reIP = ExtractString(messageWOPro, "ip");
+                        string rePortString = ExtractString(messageWOPro, "port");
+                        rePort = Int32.Parse(rePortString);
+
+                        lbReName.Text = reUsrName;
+                        lbReIP.Text = reIP + ":" + rePort;
+
+                        lbRe.Show();
+                        lbReName.Show();
+                        lbReIP.Show();
+                        btnReAc.Show();
+                        btnReDe.Show();
+                    }
+                }
+                if(messageType == "A")
+                {
+                    rtbChat.Text += "Remote accepted!\n";
+
+                    int bitlength = 2048;
+                    est = true;
+                    rtbChat.Text += "Generating " + bitlength + "-bit key...\n";
+
+                    generateKey(bitlength);
+
+                    rtbChat.Text += "Success!\n";
+                }
+                if(messageType == "D")
+                {
+                    rtbChat.Text += "Remote denyed request\n";
+                }
                 if (messageType == "H")
                 {
                     ongoingHeartBeat = true;
                     if (message == heartBeatString)
                     {
-                        int bitlength = 2048;
+                        
 
                         rtbChat.Text += "Success!\n";
-                        if (est == false)
-                        {
-                            est = true;
-                            rtbChat.Text += "Generating " + bitlength + "-bit key...\n";
-
-                            #region Key generation and exchange
-
-                            var csp = new RSACryptoServiceProvider(bitlength);
-
-                            var privKey = csp.ExportParameters(true);
-
-                            var pubKey = csp.ExportParameters(false);
-
-                            string pubKeyStringLocal;
-                            {
-                                //we need some buffer
-                                var sw = new System.IO.StringWriter();
-                                //we need a serializer
-                                var xsw = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
-                                //serialize the key into the stream
-                                xsw.Serialize(sw, pubKey);
-                                //get the string from the stream
-                                pubKeyStringLocal = sw.ToString();
-                                pubKeyString = pubKeyStringLocal;
-                            }
-                            string privKeyStringLocal;
-                            {
-                                //we need some buffer
-                                var sw = new System.IO.StringWriter();
-                                //we need a serializer
-                                var xsx = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
-                                //serialize the key into the stream
-                                xsx.Serialize(sw, privKey);
-                                //get the string from the stream
-                                privKeyStringLocal = sw.ToString();
-                                privKeyString = privKeyStringLocal;
-                            }
-
-                            csp = new RSACryptoServiceProvider();
-                            csp.ImportParameters(pubKey);
-
-                            string keyToSend = "K" + pubKeyString;
-                            byte[] keydata = Encoding.ASCII.GetBytes(keyToSend);
-
-                            rtbChat.Text += "Sending public key to remote...\n";
-
-                            sendingClient.Send(keydata, keydata.Length);
-
-                            #endregion
-                            rtbChat.Text += "Success!\n";
-
-                        }
                     }
                     else
                     {
                         ongoingHeartBeat = true;
-                        string sendTo = message.Substring(1);
-                        int sendToPort = Int32.Parse(message.TrimStart(Convert.ToChar(sendTo)));
+                        string sendToWOPro = message.Substring(1);
+                        string sendTo = sendToWOPro.Remove(sendToWOPro.Length - 5);
+                        int sendToPort = Int32.Parse(message.TrimStart(Convert.ToChar("H" + sendTo)));
                         InitializeHeartBeatSender(sendTo, sendToPort);
                         byte[] heartBeatBack = Encoding.ASCII.GetBytes(message);
 
@@ -331,7 +315,7 @@ namespace RSA_chat
         #region Heartbeat
         public static void heartBeat()
         {
-            heartBeatString = "H" + broadcastAddress + port;
+            heartBeatString = "H" + localIP + port;
 
             byte[] heartBeatData = Encoding.ASCII.GetBytes(heartBeatString);
 
@@ -344,12 +328,69 @@ namespace RSA_chat
             heartBeat();
         }
         #endregion
+        #region Connection request
+        void conRe()
+        {
+            string conReToSend = "R" + "<ip>" + localIP + "</ip><port>" + port + "</port><username>" + userName + "</username>";
+            byte[] reData = Encoding.ASCII.GetBytes(conReToSend);
+            sendingClient.Send(reData, reData.Length);
+        }
+        #endregion
         #region Other
+        void enterChatMode()
+        {
+            lbIP.Hide();
+            lbPor.Hide();
+            lbPORT.Hide();
+            lbUsr.Hide();
+            tbIP.Hide();
+            tbPORT.Hide();
+            tbUsr.Hide();
+            btnEntr.Hide();
+
+            rtbChat.Show();
+            tbSend.Show();
+            tbCngIP.Show();
+            tbCngPort.Show();
+            btnCng.Show();
+            btnSend.Show();
+            btnHeartBeat.Show();
+            //btnCnt.Show();
+            lbPortCng.Show();
+
+            tbCngIP.Text = broadcastAddress;
+            tbCngPort.Text = port.ToString();
+        }
+        public static string GetPublicIP()
+        {
+            String direction = "";
+            WebRequest request = WebRequest.Create("http://checkip.dyndns.org/");
+            using (WebResponse response = request.GetResponse())
+            using (StreamReader stream = new StreamReader(response.GetResponseStream()))
+            {
+                direction = stream.ReadToEnd();
+            }
+
+            //Search for the ip in the html
+            int first = direction.IndexOf("Address: ") + 9;
+            int last = direction.LastIndexOf("</body>");
+            direction = direction.Substring(first, last - first);
+
+            return direction;
+        }
         public static string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+        string ExtractString(string s, string tag)
+        {
+            // You should check for errors in real-world code, omitted for brevity
+            var startTag = "<" + tag + ">";
+            int startIndex = s.IndexOf(startTag) + startTag.Length;
+            int endIndex = s.IndexOf("</" + tag + ">", startIndex);
+            return s.Substring(startIndex, endIndex - startIndex);
         }
         private void label3_Click(object sender, EventArgs e)
         {
@@ -380,5 +421,95 @@ namespace RSA_chat
 
         }
         #endregion
+
+        private void btnReAc_Click(object sender, EventArgs e)
+        {
+
+            if (string.IsNullOrEmpty(tbUsr.Text))
+            {
+                MessageBox.Show("Please enter a username");
+                return;
+            }
+            else
+            {
+                broadcastAddress = reIP;
+                port = rePort;
+                InitializeSender(broadcastAddress, port);
+
+                lbRe.Hide();
+                lbReName.Hide();
+                lbReIP.Hide();
+                btnReAc.Hide();
+                btnReDe.Hide();
+
+                enterChatMode();
+
+                byte[] acData = Encoding.ASCII.GetBytes("A");
+                sendingClient.Send(acData, acData.Length);
+
+                est = true;
+            }
+
+        }
+
+        private void btnReDe_Click(object sender, EventArgs e)
+        {
+            lbRe.Hide();
+            lbReName.Hide();
+            lbReIP.Hide();
+            btnReAc.Hide();
+            btnReDe.Hide();
+
+            byte[] deData = Encoding.ASCII.GetBytes("D");
+            InitializeSender(reIP, rePort);
+            sendingClient.Send(deData, deData.Length);
+        }
+        void generateKey(int keylength)
+        {
+            #region Key generation and exchange
+
+            var csp = new RSACryptoServiceProvider(keylength);
+
+            var privKey = csp.ExportParameters(true);
+
+            var pubKey = csp.ExportParameters(false);
+
+            string pubKeyStringLocal;
+            {
+                //we need some buffer
+                var sw = new System.IO.StringWriter();
+                //we need a serializer
+                var xsw = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                //serialize the key into the stream
+                xsw.Serialize(sw, pubKey);
+                //get the string from the stream
+                pubKeyStringLocal = sw.ToString();
+                pubKeyString = pubKeyStringLocal;
+            }
+            string privKeyStringLocal;
+            {
+                //we need some buffer
+                var sw = new System.IO.StringWriter();
+                //we need a serializer
+                var xsx = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                //serialize the key into the stream
+                xsx.Serialize(sw, privKey);
+                //get the string from the stream
+                privKeyStringLocal = sw.ToString();
+                privKeyString = privKeyStringLocal;
+            }
+
+            csp = new RSACryptoServiceProvider();
+            csp.ImportParameters(pubKey);
+
+            string keyToSend = "K" + pubKeyString;
+            byte[] keydata = Encoding.ASCII.GetBytes(keyToSend);
+
+            rtbChat.Text += "Sending public key to remote...\n";
+
+            sendingClient.Send(keydata, keydata.Length);
+
+            #endregion
+        }
     }
 }
